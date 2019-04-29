@@ -1,10 +1,39 @@
 
+const errors = require('restify-errors');
+const context = require('../components/context');
+
 class HelloController
 {
-	constructor (app, storage)
+	constructor (app, server)
 	{
 		this.app = app;
-		this.storage = storage;
+		
+		this.setServerRouting(server, [
+			{
+				"path":"/hello/:name", "type":"get", "handler": this.read,
+				"options": {
+					"auth": { "strategy":"Basic", "storage":"Hello" },
+					"access": { "allow":true, "deny":null }
+				},
+				"name":"Get Hello",
+				"description":"Get Hello Greeting"
+			},
+		]);
+	}
+	setServerRouting (server, routes)
+	{
+		routes.forEach((routeObj) => {
+
+			server[routeObj.type]({ path: routeObj.path, name: routeObj.name||'' }, async (req, res, next) => {
+				// create context
+				let ctx = new context(routeObj.options);
+				if (ctx.accessIsAllowed()) {
+					this[method](req, res, next);
+				} else {
+					next(new errors.ForbiddenError());
+				}
+			});
+		});
 	}
 
 	read (req, res, next)

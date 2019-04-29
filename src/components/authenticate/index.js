@@ -1,12 +1,12 @@
 
 class Authenticate
 {
-	constructor ()
+	constructor (options)
 	{
-		
+		this.options = options;
 	}
 
-	authorization ()
+	getUser ()
 	{
 		return { uid: 1, name: 'Sean', admin: false };
 	}

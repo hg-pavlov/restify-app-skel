@@ -10,7 +10,8 @@ class Access
 	process (user)
 	{
 		console.log('try user access: ',user,this.rules);
-		return false;
+		this.allowed = false;
+		return this.allowed;
 	}
 }
 
