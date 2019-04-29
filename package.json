@@ -1,0 +1,23 @@
+{
+  "name": "restify-app-skel",
+  "version": "1.0.0",
+  "description": "Application skeleton based on restify framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hg-pavlov/restify-app-skel.git"
+  },
+  "keywords": [
+    "restify",
+    "application"
+  ],
+  "author": "MPavlov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hg-pavlov/restify-app-skel/issues"
+  },
+  "homepage": "https://github.com/hg-pavlov/restify-app-skel#readme"
+}
