@@ -1,0 +1,8 @@
+{
+	"server": {
+		"name": "HGNET API",
+		"dtrace": false,
+		"port": 1337,
+		"host": "localhost"
+	}
+}

@@ -1,0 +1,32 @@
+[
+	{
+		"path":"/hello/:name",
+		"handlers":
+		{
+			"get:Hello#read":
+			{
+				"auth":
+				{
+					"strategy":"Basic",
+					"storage":"Hello"
+				},
+				"access":
+				{
+					"allow":true,
+					"deny":null
+				}
+			},
+			"post:Hello#create":
+			{
+			},
+			"put:Hello#update":
+			{
+			},
+			"del:Hello#remove":
+			{
+			}
+		},
+		"name":"Get Hello",
+		"description":"Get Hello Greeting"
+	}
+]
