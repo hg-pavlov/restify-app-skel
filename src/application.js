@@ -50,6 +50,7 @@ class App
 		let modelsPath = path.join(__dirname, 'models');
 		this.models = {};
 		fs.readdirSync(modelsPath).forEach((file) => {
+			if (file.indexOf('.') === 0) return;
 			let model = require(path.join(modelsPath, file)),
 			key = file.replace(/(Model|\.js$)/ig,'');
 			this.models[key] = new model(this);
@@ -60,6 +61,7 @@ class App
 		let storagesPath = path.join(__dirname, 'storages');
 		this.storages = {};
 		fs.readdirSync(storagesPath).forEach((file) => {
+			if (file.indexOf('.') === 0) return;
 			let storage = require(path.join(storagesPath, file)),
 			key = file.replace(/(Storage|\.js$)/ig,'');
 			this.storages[key] = new storage(this, this.getModel(key));
@@ -74,6 +76,7 @@ class App
 		let controllersPath = path.join(__dirname, 'controllers');
 		this.controllers = {};
 		fs.readdirSync(controllersPath).forEach((file) => {
+			if (file.indexOf('.') === 0) return;
 			let controller = require(path.join(controllersPath, file)),
 			key = file.replace(/(Controller|\.js$)/ig,'');
 			this.controllers[key] = new controller(this, this.getStorage(key));
