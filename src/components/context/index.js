@@ -16,7 +16,7 @@ class Context
 
 	accessIsAllowed ()
 	{
-		
+		return this.access.allowed;
 	}
 }
 

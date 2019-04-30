@@ -23,8 +23,8 @@ class HelloController
 					"auth": { "strategy":"Basic", "storage":"Hello" },
 					"access": { "allow":true, "deny":null }
 				},
-				"name":"Get Hello",
-				"description":"Get Hello Greeting"
+				"name":"Create Hello",
+				"description":"Create Hello Greeting"
 			},
 			{
 				"path":"/hello/:name", "type":"put", "handler": this.update,
@@ -32,8 +32,8 @@ class HelloController
 					"auth": { "strategy":"Basic", "storage":"Hello" },
 					"access": { "allow":true, "deny":null }
 				},
-				"name":"Get Hello",
-				"description":"Get Hello Greeting"
+				"name":"Update Hello",
+				"description":"Update Hello Greeting"
 			},
 			{
 				"path":"/hello/:name", "type":"del", "handler": this.remove,
@@ -41,15 +41,15 @@ class HelloController
 					"auth": { "strategy":"Basic", "storage":"Hello" },
 					"access": { "allow":true, "deny":null }
 				},
-				"name":"Get Hello",
-				"description":"Get Hello Greeting"
+				"name":"Delete Hello",
+				"description":"Delete Hello Greeting"
 			},
 		];
 	}
 
 	read (ctx, req, res, next)
 	{
-		console.log(this.app.context,req.username,req.authorization);
+		console.log('----',req.username,req.authorization);
 		res.send({
 			hello: req.params.name
 		});
