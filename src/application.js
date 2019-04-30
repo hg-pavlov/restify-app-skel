@@ -1,9 +1,13 @@
 
-const path = require('path'), fs = require("fs"), restify = require('restify'), errors = require('restify-errors');
+const fs = require("fs"),
+	path = require('path'),
+	restify = require('restify'),
+	errors = require('restify-errors'),
+	context = require('./components/context');
 
 class App
 {
-	constructor (config, routes)
+	constructor (config)
 	{
 		this.config = config;
 
@@ -41,7 +45,24 @@ class App
 			if (file.indexOf('.') === 0 || file.indexOf('Controller') === -1) return;
 			let controller = require(path.join(controllersPath, file)),
 			key = file.replace(/(Controller|\.js$)/ig,'');
-			this.controllers[key] = new controller(this, this.server);
+			this.controllers[key] = new controller(this, key);
+			this.setServerRouting(this.server, this.controllers[key].routes);
+		});
+	}
+
+	setServerRouting (server, routes)
+	{
+		routes.forEach((routeObj) => {
+
+			server[routeObj.type]({ path: routeObj.path, name: routeObj.name||'' }, async (req, res, next) => {
+				// create context
+				let ctx = new context(routeObj.options);
+				if (ctx.accessIsAllowed()) {
+					routeObj.handler(ctx, req, res, next);
+				} else {
+					next(new errors.ForbiddenError());
+				}
+			});
 		});
 	}
 }

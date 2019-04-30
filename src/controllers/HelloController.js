@@ -1,14 +1,13 @@
 
 const errors = require('restify-errors');
-const context = require('../components/context');
 
 class HelloController
 {
-	constructor (app, server)
+	constructor (app, key)
 	{
 		this.app = app;
-		
-		this.setServerRouting(server, [
+		this.key = key;
+		this.routes = [
 			{
 				"path":"/hello/:name", "type":"get", "handler": this.read,
 				"options": {
@@ -18,25 +17,37 @@ class HelloController
 				"name":"Get Hello",
 				"description":"Get Hello Greeting"
 			},
-		]);
+			{
+				"path":"/hello/:name", "type":"post", "handler": this.create,
+				"options": {
+					"auth": { "strategy":"Basic", "storage":"Hello" },
+					"access": { "allow":true, "deny":null }
+				},
+				"name":"Get Hello",
+				"description":"Get Hello Greeting"
+			},
+			{
+				"path":"/hello/:name", "type":"put", "handler": this.update,
+				"options": {
+					"auth": { "strategy":"Basic", "storage":"Hello" },
+					"access": { "allow":true, "deny":null }
+				},
+				"name":"Get Hello",
+				"description":"Get Hello Greeting"
+			},
+			{
+				"path":"/hello/:name", "type":"del", "handler": this.remove,
+				"options": {
+					"auth": { "strategy":"Basic", "storage":"Hello" },
+					"access": { "allow":true, "deny":null }
+				},
+				"name":"Get Hello",
+				"description":"Get Hello Greeting"
+			},
+		];
 	}
-	setServerRouting (server, routes)
-	{
-		routes.forEach((routeObj) => {
 
-			server[routeObj.type]({ path: routeObj.path, name: routeObj.name||'' }, async (req, res, next) => {
-				// create context
-				let ctx = new context(routeObj.options);
-				if (ctx.accessIsAllowed()) {
-					this[method](req, res, next);
-				} else {
-					next(new errors.ForbiddenError());
-				}
-			});
-		});
-	}
-
-	read (req, res, next)
+	read (ctx, req, res, next)
 	{
 		console.log(this.app.context,req.username,req.authorization);
 		res.send({
@@ -45,17 +56,17 @@ class HelloController
 		return next();
 	}
 
-	create (req, res, next)
+	create (ctx, req, res, next)
 	{
 		return next();
 	}
 
-	update (req, res, next)
+	update (ctx, req, res, next)
 	{
 		return next();
 	}
 
-	remove (req, res, next)
+	remove (ctx, req, res, next)
 	{
 		return next();
 	}
