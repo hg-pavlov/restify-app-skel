@@ -36,7 +36,7 @@ class Application
 
 	loadComponents (app, server)
 	{
-		let components = {}, componentsPath = path.join(this.srcDir, 'components');
+		let components = {}, componentsPath = path.join(app.srcDir, 'components');
 		fs.readdirSync(componentsPath)
 		.forEach((componentDir) => {
 			let componentPath = path.join(componentsPath, componentDir);
@@ -59,6 +59,25 @@ class Application
 				}
 			});
 		});
+	}
+
+	getComponentRepository (repoName)
+	{
+		let repoPath = null;
+
+		if (typeof repoName !== 'string')
+			throw new errors.InternalError('Repository must be identified by <component>#<repository> signature');
+
+		repoPath = repoName.split('#');
+
+		if (repoPath.length !== 2)
+			throw new errors.InternalError('Repository identificator must consists of two parts');
+
+		if (typeof this.components[repoPath[0]] === 'undefined' || typeof this.components[repoPath[0]].repositories[repoPath[1]] === 'undefined') {
+			throw new errors.InternalError('Repository is not exists "'+repoName+'"');
+		}
+
+		return this.components[repoPath[0]].repositories[repoPath[1]];
 	}
 }
 

@@ -12,6 +12,13 @@ class Component
 		this.componentDir = componentDir;
 
 		this.controllers = this.loadControllers();
+		this.repositories = this.loadRepositories();
+		this.models = this.loadModels();
+
+		console.log('=========== component: '+componentDir+' =============');
+		console.log('controllers: ',Object.keys(this.controllers));
+		console.log('repositories: ',Object.keys(this.repositories));
+		console.log('models: ',Object.keys(this.models));
 	}
 
 	onEvent (eventName, eventHandler)
@@ -21,9 +28,12 @@ class Component
 
 	loadElement (app, elementDir, elementInit)
 	{
-		let elDir1stChar = elementDir.charAt(0),
-		suffRe = new RegExp('^'+elDir1stChar), suffCh = elDir1stChar.toUpperCase(),
-		elementSuffix = elementDir.replace(suffRe, suffCh).replace(/s$/i, '');
+		let elementSuffix = '';
+		switch (elementDir) {
+		case 'controllers': elementSuffix = 'Controller'; break;
+		case 'repositories': elementSuffix = 'Repository'; break;
+		case 'models': elementSuffix = 'Model'; break;
+		}
 
 		let elementObjList = {}, elementPath = path.join(this.componentDir, elementDir);
 		fs.readdirSync(elementPath)
@@ -44,6 +54,14 @@ class Component
 		return this.loadElement(this.app, 'controllers', (controller) => {
 			this.app.setServerRouting(this.server, this, controller);
 		});
+	}
+	loadRepositories ()
+	{
+		return this.loadElement(this.app, 'repositories');
+	}
+	loadModels ()
+	{
+		return this.loadElement(this.app, 'models');
 	}
 }
 

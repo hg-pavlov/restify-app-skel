@@ -11,7 +11,7 @@ class UserController
 			{
 				"path":"/user/:id", "type":"get", "handler": this.read,
 				"options": {
-					"auth": { "strategy":"Basic", "repository":"User" },
+					"auth": { "strategy":"Basic", "repository":"users#User" },
 					"access": { "allow":true, "deny":null }
 				},
 				"name":"Get User",
@@ -20,7 +20,7 @@ class UserController
 			{
 				"path":"/user/:id", "type":"post", "handler": this.create,
 				"options": {
-					"auth": { "strategy":"Basic", "repository":"User" },
+					"auth": { "strategy":"Basic", "repository":"users#User" },
 					"access": { "allow":true, "deny":null }
 				},
 				"name":"Create User",
@@ -29,7 +29,7 @@ class UserController
 			{
 				"path":"/user/:id", "type":"put", "handler": this.update,
 				"options": {
-					"auth": { "strategy":"Basic", "repository":"User" },
+					"auth": { "strategy":"Basic", "repository":"users#User" },
 					"access": { "allow":true, "deny":null }
 				},
 				"name":"Update User",
@@ -38,7 +38,7 @@ class UserController
 			{
 				"path":"/user/:id", "type":"del", "handler": this.remove,
 				"options": {
-					"auth": { "strategy":"Basic", "repository":"User" },
+					"auth": { "strategy":"Basic", "repository":"users#User" },
 					"access": { "allow":true, "deny":null }
 				},
 				"name":"Delete User",

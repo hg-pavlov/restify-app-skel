@@ -1,22 +1,26 @@
 
+const errors = require('restify-errors');
+
 class Access
 {
-	constructor ()
+	constructor (app)
 	{
+		this.app = app;
 	}
 
 	process (rules, user, req)
 	{
-		console.log('try user access: ',user,rules);
-		req.set('access.allowed', rules.allow ? true : false);
-		console.log('access set to: ',req.get('access.allowed'));
+		let allowed = rules.allow ? true : false;
+		req.set('access.allowed', allowed);
+		if (!allowed) {
+			throw new errors.ForbiddenError();
+		}
 	}
 
 	isAllowed (req)
 	{
-		console.log('access get from: ',req.get('access.allowed'));
 		return req.get('access.allowed');
 	}
 }
 
-module.exports = new Access();
+module.exports = Access;
