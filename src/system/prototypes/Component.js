@@ -36,16 +36,18 @@ class Component
 		}
 
 		let elementObjList = {}, elementPath = path.join(this.componentDir, elementDir);
-		fs.readdirSync(elementPath)
-		.forEach((file) => {
-			let elementFilePath = path.join(elementPath, file);
-			let fstat = fs.statSync(elementFilePath);
-			if (!fstat.isFile() || file.indexOf('.') === 0 || file.indexOf(elementSuffix) === -1) return;
-			let elementObj = require(elementFilePath),
-			keyRe = new RegExp('('+elementSuffix+'|\.js$)', 'ig'), key = file.replace(keyRe,'');
-			elementObjList[key] = new elementObj(app, key);
-			if (elementInit) elementInit(elementObjList[key]);
-		});
+		if (fs.existsSync(elementPath)) {
+			fs.readdirSync(elementPath)
+			.forEach((file) => {
+				let elementFilePath = path.join(elementPath, file);
+				let fstat = fs.statSync(elementFilePath);
+				if (!fstat.isFile() || file.indexOf('.') === 0 || file.indexOf(elementSuffix) === -1) return;
+				let elementObj = require(elementFilePath),
+				keyRe = new RegExp('('+elementSuffix+'|\.js$)', 'ig'), key = file.replace(keyRe,'');
+				elementObjList[key] = new elementObj(app, key);
+				if (elementInit) elementInit(elementObjList[key]);
+			});
+		}
 		return elementObjList;
 	}
 

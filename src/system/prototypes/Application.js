@@ -34,10 +34,16 @@ class Application
 		);
 	}
 
+	loadSequence ()
+	{
+		return [];
+	}
+
 	loadComponents (app, server)
 	{
 		let components = {}, componentsPath = path.join(app.srcDir, 'components');
-		fs.readdirSync(componentsPath)
+	//	fs.readdirSync(componentsPath)
+		this.loadSequence()
 		.forEach((componentDir) => {
 			let componentPath = path.join(componentsPath, componentDir);
 			let componentClass = require(path.join(componentPath, 'index.js'));
@@ -52,13 +58,22 @@ class Application
 
 			server[routeObj.type]({ path: routeObj.path, name: routeObj.name||'' }, async (req, res, next) => {
 				try {
-					this.broadcast.emit('appBeforeController', routeObj, req);
+					this.broadcast.emit('appBeforeController', routeObj, req, res, next);
 					routeObj.handler(req, res, next);
 				} catch (err) {
 					next(err);
 				}
 			});
 		});
+	}
+
+	getComponent (compName)
+	{
+		if (typeof this.components[compName] === 'undefined') {
+			throw new errors.InternalError('Component is not exists "'+compName+'"');
+		}
+
+		return this.components[compName];
 	}
 
 	getComponentRepository (repoName)

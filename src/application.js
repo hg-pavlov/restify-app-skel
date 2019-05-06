@@ -14,6 +14,16 @@ class App extends Application
 		this.server.use(restify.plugins.urlEncodedBodyParser());
 	}
 
+	loadSequence ()
+	{
+		return [
+			'authenticate',
+			'access',
+			'users',
+			'default',
+		];
+	}
+
 	start ()
 	{
 		this.server.listen(
