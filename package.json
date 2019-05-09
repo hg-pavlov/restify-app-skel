@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha __test__"
   },
   "repository": {
     "type": "git",
@@ -31,5 +31,9 @@
     "restify": "^8.3.1",
     "restify-errors": "^7.0.0",
     "restify-jwt-community": "^1.0.12"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.0.0"
   }
 }

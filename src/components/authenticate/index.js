@@ -29,12 +29,39 @@ class Authenticate extends Component
 			next();
 		});
 
+		this.authConfig = {
+			"local":{
+				"authHandler":this.strategyLocal.bind(this),
+				"authInitiator":this.createAuthLocal.bind(this),
+				"requiredFields":["username","password"],
+				"defaultRepository":"users#User"
+			},
+			"basic":{
+				"authHandler":this.strategyBasic.bind(this),
+				"authInitiator":this.createAuthBasic.bind(this),
+				"requiredFields":["username","password"],
+				"defaultRepository":"users#User"
+			},
+			"digest":{
+				"authHandler":this.strategyDigest.bind(this),
+				"authInitiator":this.createAuthDigest.bind(this),
+				"requiredFields":["username","password"],
+				"defaultRepository":"users#User"
+			},
+			"jwt":{
+				"authHandler":this.strategyJWT.bind(this),
+				"authInitiator":this.createAuthJWT.bind(this),
+				"requiredFields":["username","password"],
+				"defaultRepository":"users#User"
+			},
+		};
+
 		/**
 		 * authentication checking required
 		 * checking authentication hook; calling on every route !
 		 */
 		this.onEvent('appBeforeController', (routeObj, req, res, next) => {
-			if (typeof routeObj.options.auth === 'object' && routeObj.options.auth !== null) {
+			if (typeof routeObj.options === 'object' && typeof routeObj.options.auth === 'object' && routeObj.options.auth !== null) {
 				this.authenticate(routeObj.options.auth, req, res, next);
 			}
 		});
@@ -42,26 +69,20 @@ class Authenticate extends Component
 
 	authenticate (options, req, res, next)
 	{
-		let user = null, repository = this.app.getComponentRepository(options.repository);
+		let user = null, repository = (options.repository) ? this.app.getComponentRepository(options.repository) : null;
 
-		req.set('auth.repository', repository);
+		req.set('auth.repository', repository); // verification/update token from repository (database)
 		req.set('auth.options', options);
-
-		// verification/update token from repository (database)
-		if (typeof options.repository === 'undefined')
-			throw new errors.InternalError('User repository must be defined credentials to be verified');
 
 		// strategy function
 		let strategyType = options.strategy ? options.strategy.toLowerCase() : 'basic';
-		switch (strategyType) {
-			case 'local':	this.strategyLocal(req, res, next, repository, options); break;
-			case 'basic':	this.strategyBasic(req, res, next, repository, options); break;
-			case 'digest':	this.strategyDigest(req, res, next, repository, options); break;
-			case 'jwt':		this.strategyJWT(req, res, next, repository, options); break;
-			default:
-				throw new errors.InternalError('Authentication strategy "'+ strategyType +'" is not supported');
-		}
+		if (typeof this.authConfig[strategyType] === 'undefined')
+			throw new errors.InternalError('Authentication strategy "'+ strategyType +'" is not supported');
 
+		let strategyConf = this.authConfig[strategyType];
+		strategyConf.authHandler(req, res, next, repository, options);
+
+		user = req.user||null;
 		req.set('auth.user', user);
 	}
 
@@ -73,9 +94,10 @@ class Authenticate extends Component
 	{
 		return req.get('auth.options');
 	}
-	getRepository (req)
+	getRepository (req, strategyType)
 	{
-		return req.get('auth.repository');
+		return req.get('auth.repository') || ((typeof strategyType !== 'undefined' && typeof this.authConfig[strategyType] !== 'undefined') ?
+			this.app.getComponentRepository(this.authConfig[strategyType].defaultRepository) : null);
 	}
 
 	strategyLocal (req, res, next, repository, options)
@@ -83,9 +105,7 @@ class Authenticate extends Component
 		passport.authenticate(
 			'local',
 			{
-				successRedirect: '/',
-				failureRedirect: '/login',
-				failureFlash: true
+				failureRedirect: '/auth/local', failureFlash: true, session: false
 			}
 		)(req, res, next);
 	}
@@ -94,9 +114,7 @@ class Authenticate extends Component
 		passport.authenticate(
 			'basic',
 			{
-	//			successRedirect: '/',
-				failureRedirect: '/login',
-				session: false
+				failureRedirect: '/auth/basic', session: false
 			}
 		)(req, res, next);
 	}
@@ -105,9 +123,7 @@ class Authenticate extends Component
 		passport.authenticate(
 			'digest',
 			{
-	//			successRedirect: '/',
-				failureRedirect: '/login',
-				session: false
+				failureRedirect: '/auth/digest', session: false
 			}
 		)(req, res, next);
 	}
@@ -116,11 +132,42 @@ class Authenticate extends Component
 		passport.authenticate(
 			'jwt',
 			{
-	//			successRedirect: '/',
-				failureRedirect: '/login',
-				session: false
+				failureRedirect: '/auth/jwt', session: false
 			}
 		)(req, res, next);
+	}
+
+	getRequiredFieldsByStrategy (strategyType)
+	{
+		return (typeof this.authConfig[strategyType] === 'undefined') ? null : this.authConfig[strategyType].requiredFields;
+	}
+	createAuthByStrategy (strategyType, req)
+	{
+		return (typeof this.authConfig[strategyType] === 'undefined') ? null : this.authConfig[strategyType].authInitiator(req);
+	}
+
+	createAuthLocal (req)
+	{
+		let repository = this.getRepository(req, 'local');
+		return { "strategy": "LOCAL", "username": "maksim", "token": "jjjjjjjjjjj", "refreshToken": "KKkkkkkkkkkkkkk" };
+	}
+
+	createAuthBasic (req)
+	{
+		let repository = this.getRepository(req, 'basic');
+		return { "strategy": "BASIC", "username": "maksim", "token": "jjjjjjjjjjj", "refreshToken": "KKkkkkkkkkkkkkk" };
+	}
+
+	createAuthDigest (req)
+	{
+		let repository = this.getRepository(req, 'digest');
+		return { "strategy": "DIGEST", "username": "maksim", "token": "jjjjjjjjjjj", "refreshToken": "KKkkkkkkkkkkkkk" };
+	}
+
+	createAuthJWT (req)
+	{
+		let repository = this.getRepository(req, 'jwt');
+		return { "strategy": "JWT", "username": "maksim", "token": "jjjjjjjjjjj", "refreshToken": "KKkkkkkkkkkkkkk" };
 	}
 }
 

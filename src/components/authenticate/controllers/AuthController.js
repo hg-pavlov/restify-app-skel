@@ -1,47 +1,66 @@
 
-const errors = require('restify-errors');
+const path = require('path'),
+	errors = require('restify-errors');
+
+let application = null;
 
 class AuthController
 {
 	constructor (app, key)
 	{
+		application = app;
 		this.app = app;
 		this.key = key;
 		this.routes = [
 			{
-				"path":"/auth", "type":"get", "handler": this.authForm,
-				"options": {
-					"auth": { "strategy":"Basic", "repository":"users#User" },
-					"access": { "allow":true, "deny":null }
-				},
-				"name":"Get Hello",
-				"description":"Get Hello Greeting"
+				"path":"/auth/:strategy", "type":"get", "handler": this.authRequirements,
+				"name":"Get Auth",
+				"description":"Get Requirements for that strategy"
 			},
 			{
-				"path":"/auth", "type":"post", "handler": this.authProc,
-				"options": {
-					"auth": { "strategy":"Basic", "repository":"users#User" },
-					"access": { "allow":true, "deny":null }
-				},
-				"name":"Create Hello",
-				"description":"Create Hello Greeting"
+				"path":"/auth/:strategy", "type":"post", "handler": this.authProcess,
+				"name":"Create Auth",
+				"description":"Create Authentication"
 			},
 		];
 	}
 
-	authForm (req, res, next)
+	authRequirements (req, res, next)
 	{
-		console.log('get ----',req.username,req.authorization);
+		let componentName = path.basename(path.join(__dirname,'..'));
+		let auth = application.getComponent(componentName), strategy = req.params.strategy.toLowerCase();
+		if (!auth)
+			throw new errors.InternalServerError('Authenticate component not found by name "'+componentName+'"');
+		if (!strategy || strategy.length < 1)
+			throw new errors.InternalServerError('Strategy is undefined in the url path');
+
+		let requiredFields = auth.getRequiredFieldsByStrategy(strategy);
+		if (!requiredFields)
+			throw new errors.NotFoundError('Strategy "'+req.params.strategy+'" is not implemented yet');
+
 		res.send({
-			hello: 'ddkd'
+			strategy: strategy,
+			requiredFields: requiredFields
 		});
 		return next();
 	}
 
-	authProc (req, res, next)
+	authProcess (req, res, next)
 	{
-		console.log('post ----',req.username,req.authorization);
-		res.send(200);
+		let componentName = path.basename(path.join(__dirname,'..'));
+		let auth = application.getComponent(componentName), strategy = req.params.strategy.toLowerCase();
+		if (!auth)
+			throw new errors.InternalServerError('Authenticate component not found by name "'+componentName+'"');
+		if (!strategy || strategy.length < 1)
+			throw new errors.InternalServerError('Strategy is undefined in the url path');
+
+		let result = auth.createAuthByStrategy(strategy, req);
+		if (!result)
+			throw new errors.NotFoundError('Strategy "'+req.params.strategy+'" is not implemented yet');
+
+		res.send({
+			result: result
+		});
 		return next();
 	}
 }

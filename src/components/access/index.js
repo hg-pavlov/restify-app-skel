@@ -13,7 +13,7 @@ class Access extends Component
 		 * checking access hook; calling on every route !
 		 */
 		this.onEvent('appBeforeController', (routeObj, req, res, next) => {
-			if (typeof routeObj.options.access === 'object' && routeObj.options.access !== null) {
+			if (typeof routeObj.options === 'object' && typeof routeObj.options.access === 'object' && routeObj.options.access !== null) {
 				this.process(routeObj.options.access, this.app.getComponent('authenticate').getUser(req), req);
 			}
 		});

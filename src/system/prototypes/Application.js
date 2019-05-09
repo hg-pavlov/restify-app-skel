@@ -42,7 +42,6 @@ class Application
 	loadComponents (app, server)
 	{
 		let components = {}, componentsPath = path.join(app.srcDir, 'components');
-	//	fs.readdirSync(componentsPath)
 		this.loadSequence()
 		.forEach((componentDir) => {
 			let componentPath = path.join(componentsPath, componentDir);
@@ -67,13 +66,9 @@ class Application
 		});
 	}
 
-	getComponent (compName)
+	getComponent (componentName)
 	{
-		if (typeof this.components[compName] === 'undefined') {
-			throw new errors.InternalError('Component is not exists "'+compName+'"');
-		}
-
-		return this.components[compName];
+		return (typeof this.components[componentName] !== 'undefined') ? this.components[componentName] : null;
 	}
 
 	getComponentRepository (repoName)
