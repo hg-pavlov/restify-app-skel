@@ -34,25 +34,37 @@ class Authenticate extends Component
 				"authHandler":this.strategyLocal.bind(this),
 				"authInitiator":this.createAuthLocal.bind(this),
 				"requiredFields":["username","password"],
-				"defaultRepository":"users#User"
+				"defaultRepository":"users#User",
+				"passportOptions": {
+					session: false
+				}
 			},
 			"basic":{
 				"authHandler":this.strategyBasic.bind(this),
 				"authInitiator":this.createAuthBasic.bind(this),
 				"requiredFields":["username","password"],
-				"defaultRepository":"users#User"
+				"defaultRepository":"users#User",
+				"passportOptions": {
+					session: false
+				}
 			},
 			"digest":{
 				"authHandler":this.strategyDigest.bind(this),
 				"authInitiator":this.createAuthDigest.bind(this),
 				"requiredFields":["username","password"],
-				"defaultRepository":"users#User"
+				"defaultRepository":"users#User",
+				"passportOptions": {
+					session: false
+				}
 			},
 			"jwt":{
 				"authHandler":this.strategyJWT.bind(this),
 				"authInitiator":this.createAuthJWT.bind(this),
 				"requiredFields":["username","password"],
-				"defaultRepository":"users#User"
+				"defaultRepository":"users#User",
+				"passportOptions": {
+					session: false
+				}
 			},
 		};
 
@@ -102,39 +114,23 @@ class Authenticate extends Component
 
 	strategyLocal (req, res, next, repository, options)
 	{
-		passport.authenticate(
-			'local',
-			{
-				failureRedirect: '/auth/local', failureFlash: true, session: false
-			}
-		)(req, res, next);
+		let strategyType = 'local', passportOptions = this.authConfig[strategyType].passportOptions||{};
+		passport.authenticate(strategyType, passportOptions)(req, res, next);
 	}
 	strategyBasic (req, res, next, repository, options)
 	{
-		passport.authenticate(
-			'basic',
-			{
-				failureRedirect: '/auth/basic', session: false
-			}
-		)(req, res, next);
+		let strategyType = 'basic', passportOptions = this.authConfig[strategyType].passportOptions||{};
+		passport.authenticate(strategyType, passportOptions)(req, res, next);
 	}
 	strategyDigest (req, res, next, repository, options)
 	{
-		passport.authenticate(
-			'digest',
-			{
-				failureRedirect: '/auth/digest', session: false
-			}
-		)(req, res, next);
+		let strategyType = 'digest', passportOptions = this.authConfig[strategyType].passportOptions||{};
+		passport.authenticate(strategyType, passportOptions)(req, res, next);
 	}
 	strategyJWT (req, res, next, repository, options)
 	{
-		passport.authenticate(
-			'jwt',
-			{
-				failureRedirect: '/auth/jwt', session: false
-			}
-		)(req, res, next);
+		let strategyType = 'jwt', passportOptions = this.authConfig[strategyType].passportOptions||{};
+		passport.authenticate(strategyType, passportOptions)(req, res, next);
 	}
 
 	getRequiredFieldsByStrategy (strategyType)
@@ -149,7 +145,9 @@ class Authenticate extends Component
 	createAuthLocal (req)
 	{
 		let repository = this.getRepository(req, 'local');
-		return { "strategy": "LOCAL", "username": "maksim", "token": "jjjjjjjjjjj", "refreshToken": "KKkkkkkkkkkkkkk" };
+		let user = repository ? repository.findOne(req.body) || null;
+		if (!user) throw new errors.InvalidCredentialsError();
+		return user;
 	}
 
 	createAuthBasic (req)

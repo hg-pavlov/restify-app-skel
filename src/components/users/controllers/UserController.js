@@ -9,6 +9,15 @@ class UserController
 		this.key = key;
 		this.routes = [
 			{
+				"path":"/users", "type":"get", "handler": this.readList,
+				"options": {
+					"auth": { "strategy":"Basic", "repository":"users#User" },
+					"access": { "allow":true, "deny":null }
+				},
+				"name":"Get Users",
+				"description":"Get Users"
+			},
+			{
 				"path":"/user/:id", "type":"get", "handler": this.read,
 				"options": {
 					"auth": { "strategy":"Basic", "repository":"users#User" },
@@ -45,6 +54,17 @@ class UserController
 				"description":"Delete User"
 			},
 		];
+	}
+
+	readList (req, res, next)
+	{
+		res.send([
+			{ hello: '1' },
+			{ hello: '2' },
+			{ hello: '3' },
+			{ hello: '4' },
+		]);
+		return next();
 	}
 
 	read (req, res, next)
