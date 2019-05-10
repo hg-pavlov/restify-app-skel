@@ -31,8 +31,6 @@ class Authenticate extends Component
 
 		this.authConfig = {
 			"local":{
-				"authHandler":this.strategyLocal.bind(this),
-				"authInitiator":this.createAuthLocal.bind(this),
 				"requiredFields":["username","password"],
 				"defaultRepository":"users#User",
 				"passportOptions": {
@@ -40,8 +38,6 @@ class Authenticate extends Component
 				}
 			},
 			"basic":{
-				"authHandler":this.strategyBasic.bind(this),
-				"authInitiator":this.createAuthBasic.bind(this),
 				"requiredFields":["username","password"],
 				"defaultRepository":"users#User",
 				"passportOptions": {
@@ -49,8 +45,6 @@ class Authenticate extends Component
 				}
 			},
 			"digest":{
-				"authHandler":this.strategyDigest.bind(this),
-				"authInitiator":this.createAuthDigest.bind(this),
 				"requiredFields":["username","password"],
 				"defaultRepository":"users#User",
 				"passportOptions": {
@@ -58,8 +52,6 @@ class Authenticate extends Component
 				}
 			},
 			"jwt":{
-				"authHandler":this.strategyJWT.bind(this),
-				"authInitiator":this.createAuthJWT.bind(this),
 				"requiredFields":["username","password"],
 				"defaultRepository":"users#User",
 				"passportOptions": {
@@ -88,11 +80,7 @@ class Authenticate extends Component
 
 		// strategy function
 		let strategyType = options.strategy ? options.strategy.toLowerCase() : 'basic';
-		if (typeof this.authConfig[strategyType] === 'undefined')
-			throw new errors.InternalError('Authentication strategy "'+ strategyType +'" is not supported');
-
-		let strategyConf = this.authConfig[strategyType];
-		strategyConf.authHandler(req, res, next, repository, options);
+		this.authHandler(strategyType, req, res, next, repository, options);
 
 		user = req.user||null;
 		req.set('auth.user', user);
@@ -112,60 +100,27 @@ class Authenticate extends Component
 			this.app.getComponentRepository(this.authConfig[strategyType].defaultRepository) : null);
 	}
 
-	strategyLocal (req, res, next, repository, options)
-	{
-		let strategyType = 'local', passportOptions = this.authConfig[strategyType].passportOptions||{};
-		passport.authenticate(strategyType, passportOptions)(req, res, next);
-	}
-	strategyBasic (req, res, next, repository, options)
-	{
-		let strategyType = 'basic', passportOptions = this.authConfig[strategyType].passportOptions||{};
-		passport.authenticate(strategyType, passportOptions)(req, res, next);
-	}
-	strategyDigest (req, res, next, repository, options)
-	{
-		let strategyType = 'digest', passportOptions = this.authConfig[strategyType].passportOptions||{};
-		passport.authenticate(strategyType, passportOptions)(req, res, next);
-	}
-	strategyJWT (req, res, next, repository, options)
-	{
-		let strategyType = 'jwt', passportOptions = this.authConfig[strategyType].passportOptions||{};
-		passport.authenticate(strategyType, passportOptions)(req, res, next);
-	}
-
 	getRequiredFieldsByStrategy (strategyType)
 	{
 		return (typeof this.authConfig[strategyType] === 'undefined') ? null : this.authConfig[strategyType].requiredFields;
 	}
 	createAuthByStrategy (strategyType, req)
 	{
-		return (typeof this.authConfig[strategyType] === 'undefined') ? null : this.authConfig[strategyType].authInitiator(req);
+		return this.authInitiator(strategyType, req);
 	}
 
-	createAuthLocal (req)
+
+	authHandler (strategyType, req, res, next, repository, options)
 	{
-		let repository = this.getRepository(req, 'local');
-		let user = repository ? repository.findOne(req.body) || null;
+		let passportOptions = this.authConfig[strategyType].passportOptions||{};
+		passport.authenticate(strategyType, passportOptions)(req, res, next);
+	}
+	authInitiator (strategyType, req)
+	{
+		let repository = this.getRepository(req, strategyType);
+		let user = repository ? repository.findOne(req.body) : null;
 		if (!user) throw new errors.InvalidCredentialsError();
 		return user;
-	}
-
-	createAuthBasic (req)
-	{
-		let repository = this.getRepository(req, 'basic');
-		return { "strategy": "BASIC", "username": "maksim", "token": "jjjjjjjjjjj", "refreshToken": "KKkkkkkkkkkkkkk" };
-	}
-
-	createAuthDigest (req)
-	{
-		let repository = this.getRepository(req, 'digest');
-		return { "strategy": "DIGEST", "username": "maksim", "token": "jjjjjjjjjjj", "refreshToken": "KKkkkkkkkkkkkkk" };
-	}
-
-	createAuthJWT (req)
-	{
-		let repository = this.getRepository(req, 'jwt');
-		return { "strategy": "JWT", "username": "maksim", "token": "jjjjjjjjjjj", "refreshToken": "KKkkkkkkkkkkkkk" };
 	}
 }
 
