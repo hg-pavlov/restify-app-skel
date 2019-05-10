@@ -27,6 +27,14 @@ exports.Local = function(auth)
 			return done(null, user);
 		}
 	);
+	strategy.name = 'local';
+	strategy.config = {
+		"requiredFields":["username","password"],
+		"defaultRepository":"users#User",
+		"passportOptions": {
+			session: false
+		}
+	};
 
 	return strategy;
 };
@@ -44,6 +52,14 @@ exports.Basic = function(auth)
             return done(null, user);
         }
 	);
+	strategy.name = 'basic';
+	strategy.config = {
+		"requiredFields":["username","password"],
+		"defaultRepository":"users#User",
+		"passportOptions": {
+			session: false
+		}
+	};
 
 	return strategy;
 };
@@ -59,6 +75,14 @@ exports.Digest = function(auth)
             return done(null, user);
        	}
 	);
+	strategy.name = 'digest';
+	strategy.config = {
+		"requiredFields":["username","password"],
+		"defaultRepository":"users#User",
+		"passportOptions": {
+			session: false
+		}
+	};
 
 	return strategy;
 };
@@ -79,8 +103,15 @@ exports.JWT = function(auth)
             return done(null, user);
        	}
 	);
+	strategy.name = 'jwt';
+	strategy.config = {
+		"requiredFields":["username","password"],
+		"defaultRepository":"users#User",
+		"passportOptions": {
+			session: false
+		}
+	};
 
 	return strategy;
 };
-
 
