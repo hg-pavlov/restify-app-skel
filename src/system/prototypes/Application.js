@@ -3,7 +3,8 @@ const fs = require("fs"),
 	path = require('path'),
 	restify = require('restify'),
 	errors = require('restify-errors'),
-	EventEmitter = require('events');
+	EventEmitter = require('events'),
+	restifySwaggerJsdoc = require('restify-swagger-jsdoc');
 
 
 class Application
@@ -14,6 +15,7 @@ class Application
 		this.server = restify.createServer(config.server);
 		this.broadcast = new EventEmitter();
 		this.srcDir = path.join(process.cwd(), 'src');
+		this.restifySwaggerJsdoc = restifySwaggerJsdoc;
 
 		this.init();
 		this.components = this.loadComponents(this, this.server);

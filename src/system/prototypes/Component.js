@@ -10,10 +10,30 @@ class Component
 		this.app = app;
 		this.server = server;
 		this.componentDir = componentDir;
+		this.name = path.basename(componentDir);
 
 		this.controllers = this.loadControllers();
 		this.repositories = this.loadRepositories();
 		this.models = this.loadModels();
+
+		this.app.restifySwaggerJsdoc.createSwaggerPage({
+			title: 'Component '+ this.name.toLowerCase() +' API documentation', // Page title (required)
+			version: '1.0.0', // Server version (required)
+			server: this.server, // Restify server instance created with restify.createServer() (required)
+			path: '/docs/'+ this.name, // Public url where the swagger page will be available (required)
+			description: 'API component '+ this.name, // A short description of the application. (default: '')
+			tags: [{ // A list of tags used by the specification with additional metadata (default: [])
+				name: 'Component '+ this.name,
+				description: 'API of component '+ this.name,
+			}],
+			// The host (name or ip) serving the API. This MUST be the host only and does not include the scheme nor sub-paths.
+			host: this.app.config.docHost+':'+this.app.config.docPort,
+			schemes: ['http'], // The transfer protocol of the API. Values MUST be from the list: "http", "https", "ws", "wss". (default: [])
+			apis: [ componentDir + '/**/*.js' ], // Path to the API docs (default: [])
+//			definitions: {myObject: require('api/myObject.json')}, // External definitions to add to swagger (default: [])
+//			routePrefix: 'prefix', // prefix to add for all routes (default: '')
+			forceSecure: false // force swagger-ui to use https protocol to load JSON file (default: false)
+		});
 
 		console.log('=========== component: '+componentDir+' =============');
 		console.log('controllers: ',Object.keys(this.controllers));

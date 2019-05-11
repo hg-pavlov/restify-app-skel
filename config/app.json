@@ -1,4 +1,6 @@
 {
+	"docHost":"localhost",
+	"docPort":"1337",
 	"server": {
 		"name": "HGNET API",
 		"dtrace": false,

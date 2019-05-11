@@ -30,7 +30,8 @@
     "passport-local": "^1.0.0",
     "restify": "^8.3.1",
     "restify-errors": "^7.0.0",
-    "restify-jwt-community": "^1.0.12"
+    "restify-jwt-community": "^1.0.12",
+    "restify-swagger-jsdoc": "^3.0.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",

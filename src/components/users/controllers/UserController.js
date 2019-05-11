@@ -14,8 +14,6 @@ class UserController
 					"auth": { "strategy":"Basic", "repository":"users#User" },
 					"access": { "allow":true, "deny":null }
 				},
-				"name":"Get Users",
-				"description":"Get Users"
 			},
 			{
 				"path":"/user/:id", "type":"get", "handler": this.read,
@@ -23,8 +21,6 @@ class UserController
 					"auth": { "strategy":"Basic", "repository":"users#User" },
 					"access": { "allow":true, "deny":null }
 				},
-				"name":"Get User",
-				"description":"Get User"
 			},
 			{
 				"path":"/user/:id", "type":"post", "handler": this.create,
@@ -32,8 +28,6 @@ class UserController
 					"auth": { "strategy":"Basic", "repository":"users#User" },
 					"access": { "allow":true, "deny":null }
 				},
-				"name":"Create User",
-				"description":"Create User"
 			},
 			{
 				"path":"/user/:id", "type":"put", "handler": this.update,
@@ -41,8 +35,6 @@ class UserController
 					"auth": { "strategy":"Basic", "repository":"users#User" },
 					"access": { "allow":true, "deny":null }
 				},
-				"name":"Update User",
-				"description":"Update User"
 			},
 			{
 				"path":"/user/:id", "type":"del", "handler": this.remove,
@@ -50,12 +42,44 @@ class UserController
 					"auth": { "strategy":"Basic", "repository":"users#User" },
 					"access": { "allow":true, "deny":null }
 				},
-				"name":"Delete User",
-				"description":"Delete User"
 			},
 		];
 	}
 
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     tags:
+ *       - Users
+ *     description: Returns all Users from database (limited by parameters from request body)
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: offset
+ *         description: Offset of User list from start of it
+ *         in: query
+ *         required: false
+ *         type: integer
+ *         example: 10
+ *       - name: limit
+ *         description: Number of Users needed
+ *         in: query
+ *         required: false
+ *         type: integer
+ *         example: 10
+ *       - name: filter
+ *         description: Filter of User's field values
+ *         in: query
+ *         required: false
+ *         type: object
+ *         example: { "email":"^email.*$", "name":"^Maksim[a-z]$", "balance:<":10 }
+ *     responses:
+ *       200:
+ *         description: Array of All Users, limited by filter conditions and count limitations by parameters
+ *         schema:
+ *           $ref: '#/definitions/User'
+ */
 	readList (req, res, next)
 	{
 		res.send([
@@ -67,6 +91,28 @@ class UserController
 		return next();
 	}
 
+/**
+ * @swagger
+ * /user/{id}:
+ *   get:
+ *     tags:
+ *       - User
+ *     description: Returns a single User by ID
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User's id
+ *         in: path
+ *         required: true
+ *         type: integer
+ *         example: 10
+ *     responses:
+ *       200:
+ *         description: A single User
+ *         schema:
+ *           $ref: '#/definitions/User'
+ */
 	read (req, res, next)
 	{
 		console.log('----',req.username,req.authorization);

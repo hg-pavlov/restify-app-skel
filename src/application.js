@@ -1,6 +1,6 @@
 
-const restify = require('restify');
-const Application = require('./system/prototypes/Application');
+const restify = require('restify'),
+	Application = require('./system/prototypes/Application');
 
 class App extends Application
 {
