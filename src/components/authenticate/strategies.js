@@ -7,11 +7,6 @@ const fs = require('fs'),
 	rjwt = require('restify-jwt-community'),
 	jwt = require('jsonwebtoken');
 
-let keys = {
-	priv: fs.readFileSync(process.cwd()+'/config/jwt/private.key', 'utf8'),
-	pub: fs.readFileSync(process.cwd()+'/config/jwt/public.key', 'utf8')
-};
-
 
 exports.Local = function(auth)
 {
@@ -24,16 +19,20 @@ exports.Local = function(auth)
     	function(req, username, password, done) {
 			let repository = auth.getRepository(req);
 			let user = {};
-			return done(null, user);
+			if (user) {
+            	return done(null, user);
+			}
+            return done(new errors.UnauthorizedError(), user);
 		}
 	);
+	strategy.init = function (user)
+	{
+		let token = '';
+		return { token: token };
+	};
 	strategy.name = 'local';
 	strategy.config = {
-		"requiredFields":["username","password"],
-		"defaultRepository":"users#User",
-		"passportOptions": {
-			session: false
-		}
+		"strategyObj":strategy,
 	};
 
 	return strategy;
@@ -46,19 +45,21 @@ exports.Basic = function(auth)
 	    },
     	function(req, username, password, done) {
 			let repository = auth.getRepository(req);
-			let user = {};
-//			throw new errors.UnauthorizedError();
-//			return done(new errors.UnauthorizedError());
-            return done(null, user);
+			let user = repository.findOne(req.body);
+			if (user) {
+            	return done(null, user);
+			}
+            return done(new errors.UnauthorizedError(), user);
         }
 	);
+	strategy.init = function (user)
+	{
+		let token = '';
+		return { token: token };
+	};
 	strategy.name = 'basic';
 	strategy.config = {
-		"requiredFields":["username","password"],
-		"defaultRepository":"users#User",
-		"passportOptions": {
-			session: false
-		}
+		"strategyObj":strategy,
 	};
 
 	return strategy;
@@ -72,44 +73,73 @@ exports.Digest = function(auth)
     	function(req, username, password, done) {
 			let repository = auth.getRepository(req);
 			let user = {};
-            return done(null, user);
+			if (user) {
+            	return done(null, user);
+			}
+            return done(new errors.UnauthorizedError(), user);
        	}
 	);
+	strategy.init = function (user)
+	{
+		let token = '';
+		return { token: token };
+	};
 	strategy.name = 'digest';
 	strategy.config = {
-		"requiredFields":["username","password"],
-		"defaultRepository":"users#User",
-		"passportOptions": {
-			session: false
-		}
+		"strategyObj":strategy,
 	};
 
 	return strategy;
 };
 exports.JWT = function(auth)
 {
+	let conf = {
+		keys: {
+			priv: fs.readFileSync(process.cwd()+'/config/jwt/private.key', 'utf8'),
+			pub: fs.readFileSync(process.cwd()+'/config/jwt/public.key', 'utf8')
+		},
+		issuer: 'HGNET',
+		audience: 'hgnet.ru',
+		expiresIn: 600,
+		authHeaderScheme: 'JWT',
+	};
+
+	let signConf = {
+		audience: conf.audience||null,
+		issuer: conf.issuer||null,
+		algorithm: 'RS256',
+	},
+	verifyConf = {
+		audience: conf.audience||null,
+		issuer: conf.issuer||null,
+		passReqToCallback: true,
+		jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderWithScheme(conf.authHeaderScheme||'JWT'),
+		secretOrKey: conf.keys.pub,
+		algorithms: [signConf.algorithm],
+	};
 	let strategy = new passportJWT.Strategy(
-		{
-			passReqToCallback: true,
-			jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
-			secretOrKey: keys.pub,
-			issuer: 'HGNET',
-			audience: 'hgnet.ru'
-	    },
+	    verifyConf,
     	function(req, jwtPayload, done) {
 			let repository = auth.getRepository(req);
-			let user = jwtPayload;
-			console.log(user);
-            return done(null, user);
+			let user = jwtPayload.user||null;
+			if (user) {
+            	return done(null, user);
+			}
+			return done(new errors.UnauthorizedError(), null);
        	}
 	);
+	strategy.init = function (user)
+	{
+		let data = {
+			user: user,
+			exp: conf.expiresIn ? Math.ceil(new Date().getTime()/1000)+conf.expiresIn : null,
+		},
+		token = jwt.sign(data, conf.keys.priv, signConf);
+		return { token: token };
+	};
 	strategy.name = 'jwt';
 	strategy.config = {
-		"requiredFields":["username","password"],
-		"defaultRepository":"users#User",
-		"passportOptions": {
-			session: false
-		}
+		"strategyObj":strategy,
 	};
 
 	return strategy;

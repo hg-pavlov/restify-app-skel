@@ -1,0 +1,30 @@
+{
+	"local":{
+		"requiredFields":["username","password"],
+		"defaultRepository":"users#UserMysql",
+		"passportOptions": {
+			"session": false
+		}
+	},
+	"basic":{
+		"requiredFields":["username","password"],
+		"defaultRepository":"users#UserMysql",
+		"passportOptions": {
+			"session": false
+		}
+	},
+	"digest":{
+		"requiredFields":["username","password"],
+		"defaultRepository":"users#UserMysql",
+		"passportOptions": {
+			"session": false
+		}
+	},
+	"jwt":{
+		"requiredFields":["username","password"],
+		"defaultRepository":"users#UserMysql",
+		"passportOptions": {
+			"session": false
+		}
+	}
+}

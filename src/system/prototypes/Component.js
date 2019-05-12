@@ -14,7 +14,7 @@ class Component
 
 		this.controllers = this.loadControllers();
 		this.repositories = this.loadRepositories();
-		this.models = this.loadModels();
+//		this.models = this.loadModels();
 
 		this.app.restifySwaggerJsdoc.createSwaggerPage({
 			title: 'Component '+ this.name.toLowerCase() +' API documentation', // Page title (required)
@@ -38,7 +38,7 @@ class Component
 		console.log('=========== component: '+componentDir+' =============');
 		console.log('controllers: ',Object.keys(this.controllers));
 		console.log('repositories: ',Object.keys(this.repositories));
-		console.log('models: ',Object.keys(this.models));
+//		console.log('models: ',Object.keys(this.models));
 	}
 
 	onEvent (eventName, eventHandler)

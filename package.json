@@ -23,6 +23,8 @@
   "homepage": "https://github.com/hg-pavlov/restify-app-skel#readme",
   "dependencies": {
     "jsonwebtoken": "^8.5.1",
+    "jugglingdb": "^2.0.1",
+    "jugglingdb-mysql": "^0.2.3",
     "mysql": "^2.17.1",
     "passport": "^0.4.0",
     "passport-http": "^0.3.0",

@@ -11,6 +11,10 @@ class AuthController
 		application = app;
 		this.app = app;
 		this.key = key;
+		/**
+		 * default authentication repository is defined in strategies.js - for every strategy
+		 *
+		 */
 		this.routes = [
 			{
 				"path":"/auth/:strategy", "type":"get", "handler": this.authRequirements,

@@ -5,7 +5,7 @@ const fs = require('fs'),
 	passport = require('passport'),
 	Component = require(process.cwd()+'/src/system/prototypes/Component');
 
-class Authenticate extends Component
+class AuthenticateComponent extends Component
 {
 	constructor (app, server, componentDir)
 	{
@@ -41,6 +41,19 @@ class Authenticate extends Component
 				this.authenticate(routeObj.options.auth, req, res, next);
 			}
 		});
+	}
+
+	configure (config)
+	{
+		if (typeof config === 'object' && config) {
+			Object.keys(this.authConfig).forEach((key) => {
+				if (config.hasOwnProperty(key)) {
+					Object.assign(this.authConfig[key], config[key]);
+				}
+			});
+			return true;
+		}
+		return false;
 	}
 
 	authenticate (options, req, res, next)
@@ -81,6 +94,16 @@ class Authenticate extends Component
 		return this.authInitiator(strategyType, req);
 	}
 
+	strategyInit (strategyType, data)
+	{
+		return (
+			(
+				typeof strategyType !== 'undefined'
+				&& typeof this.authConfig[strategyType] !== 'undefined'
+				&& typeof this.authConfig[strategyType].strategyObj !== 'undefined'
+				&& typeof this.authConfig[strategyType].strategyObj.init === 'function'
+			) ? this.authConfig[strategyType].strategyObj.init(data) : null);
+	}
 
 	authHandler (strategyType, req, res, next, repository, options)
 	{
@@ -92,10 +115,10 @@ class Authenticate extends Component
 		let repository = this.getRepository(req, strategyType);
 		let user = repository ? repository.findOne(req.body) : null;
 		if (!user) throw new errors.InvalidCredentialsError();
-		return user;
+		return this.strategyInit(strategyType, user);
 	}
 }
 
-module.exports = Authenticate;
+module.exports = AuthenticateComponent;
 
 

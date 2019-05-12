@@ -11,35 +11,35 @@ class UserController
 			{
 				"path":"/users", "type":"get", "handler": this.readList,
 				"options": {
-					"auth": { "strategy":"Basic", "repository":"users#User" },
+					"auth": { "strategy":"JWT", "repository":"users#UserMysql" },
 					"access": { "allow":true, "deny":null }
 				},
 			},
 			{
 				"path":"/user/:id", "type":"get", "handler": this.read,
 				"options": {
-					"auth": { "strategy":"Basic", "repository":"users#User" },
+					"auth": { "strategy":"Basic", "repository":"users#UserMysql" },
 					"access": { "allow":true, "deny":null }
 				},
 			},
 			{
 				"path":"/user/:id", "type":"post", "handler": this.create,
 				"options": {
-					"auth": { "strategy":"Basic", "repository":"users#User" },
+					"auth": { "strategy":"Basic", "repository":"users#UserMysql" },
 					"access": { "allow":true, "deny":null }
 				},
 			},
 			{
 				"path":"/user/:id", "type":"put", "handler": this.update,
 				"options": {
-					"auth": { "strategy":"Basic", "repository":"users#User" },
+					"auth": { "strategy":"Basic", "repository":"users#UserMysql" },
 					"access": { "allow":true, "deny":null }
 				},
 			},
 			{
 				"path":"/user/:id", "type":"del", "handler": this.remove,
 				"options": {
-					"auth": { "strategy":"Basic", "repository":"users#User" },
+					"auth": { "strategy":"Basic", "repository":"users#UserMysql" },
 					"access": { "allow":true, "deny":null }
 				},
 			},
